@@ -15,7 +15,7 @@ class RecipeModelTest(RecipeBaseTest):
             author=self.create_author(username='newuser'),
             title='Título da Receita',
             description='Descrição da receita',
-            slug='recipe-slug',
+            slug='recipe-slug-default',
             preparation_time=10,
             preparation_time_unit='minutos',
             servings=5,
