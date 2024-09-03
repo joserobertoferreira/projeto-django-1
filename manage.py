@@ -4,12 +4,17 @@
 import os
 import sys
 
+from dotenv import load_dotenv
+
 
 def main():
     """Run administrative tasks."""
     os.environ.setdefault(
         'DJANGO_SETTINGS_MODULE', 'projeto_django_1.settings'
     )
+
+    load_dotenv()  # Load environment variables from .env file
+
     try:
         from django.core.management import (  # noqa: PLC0415
             execute_from_command_line,  # noqa: PLC0415
