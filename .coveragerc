@@ -1,3 +1,0 @@
-[run]
-branch = True
-omit = **/*test*.py,manage.py,__localcode/*,projeto_django_1/*
