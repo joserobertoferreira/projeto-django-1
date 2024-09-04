@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from unittest.mock import patch
 
 from django.urls import resolve, reverse
 
@@ -43,3 +44,19 @@ class HomeViewsTest(RecipeBaseTest):
         self.assertIn(  # noqa: PT009
             '<h1>Não existem receitas</h1>', response.content.decode('utf-8')
         )
+
+    @patch('recipes.views.PER_PAGE', new=3)
+    def test_recipe_home_pagination(self):
+        for i in range(8):
+            kwargs = {'slug': f'r{i}', 'author_data': {'username': f'u{i}'}}
+            self.create_recipe(**kwargs)
+
+        response = self.client.get(reverse('recipes:home'))
+
+        recipes = response.context['recipes']
+        paginator = recipes.paginator
+
+        self.assertEqual(paginator.num_pages, 3)  # noqa: PT009
+        self.assertEqual(len(paginator.get_page(1)), 3)  # noqa: PT009
+        self.assertEqual(len(paginator.get_page(2)), 3)  # noqa: PT009
+        self.assertEqual(len(paginator.get_page(3)), 2)  # noqa: PT009
