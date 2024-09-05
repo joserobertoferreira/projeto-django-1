@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import redirect, render
 
@@ -22,9 +23,16 @@ def register_create(request):
     if not request.POST:
         raise Http404
 
-    post = request.POST
-    request.session['register_form_data'] = post
+    POST = request.POST
+    request.session['register_form_data'] = POST
 
-    form = RegisterForm(request.POST)  # noqa: F841
+    form = RegisterForm(POST)
+
+    if form.is_valid():
+        # Save the form data to the database
+        form.save()
+        messages.success(request, 'User created successfully.')
+
+        del request.session['register_form_data']
 
     return redirect('authors:register')
