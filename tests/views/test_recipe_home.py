@@ -60,3 +60,17 @@ class HomeViewsTest(RecipeBaseTest):
         self.assertEqual(len(paginator.get_page(1)), 3)  # noqa: PT009
         self.assertEqual(len(paginator.get_page(2)), 3)  # noqa: PT009
         self.assertEqual(len(paginator.get_page(3)), 2)  # noqa: PT009
+
+    @patch('recipes.views.PER_PAGE', new=3)
+    def test_send_recipe_invalid_page(self):
+        for i in range(8):
+            kwargs = {'slug': f'r{i}', 'author_data': {'username': f'u{i}'}}
+            self.create_recipe(**kwargs)
+
+        response = self.client.get(reverse('recipes:home') + '?page=1a')
+
+        assert response.context['recipes'].number == 1
+
+        response = self.client.get(reverse('recipes:home') + '?page=2')
+
+        assert response.context['recipes'].number == 2  # noqa: PLR2004

@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from unittest import TestCase
 
 from django.test import TestCase as DjangoTestCase
@@ -119,10 +120,39 @@ class AuthorRegisterFormIntegrationTest(DjangoTestCase):
         assert error_message in response.context['form'].errors.get('password')
 
     def test_password_field_is_strong(self):
-        self.form_data['password'] = 'Str0ngPassword1'
+        # self.form_data['password'] = 'Str0ngPassword1'
         url = reverse('authors:create')
         response = self.client.post(url, data=self.form_data, follow=True)
 
         error_message = 'Password is not strong enough'
 
         assert error_message not in response.content.decode('utf-8')
+
+    def test_if_password_and_password_confirmation_are_equal(self):
+        self.form_data['password2'] = 'Teste'
+
+        url = reverse('authors:create')
+        response = self.client.post(url, data=self.form_data, follow=True)
+
+        error_message = 'Passwords do not match'
+
+        assert error_message in response.context['form'].errors.get('password')
+        assert error_message in response.content.decode('utf-8')
+
+    def test_send_request_to_register_view_using_get(self):
+        url = reverse('authors:create')
+        response = self.client.get(url)
+
+        assert response.status_code == HTTPStatus.NOT_FOUND
+
+    def test_if_email_already_exist(self):
+        url = reverse('authors:create')
+
+        self.client.post(url, data=self.form_data, follow=True)
+
+        response = self.client.post(url, data=self.form_data, follow=True)
+
+        error_message = 'Email already registered'
+
+        assert error_message in response.content.decode('utf-8')
+        assert error_message in response.context['form'].errors.get('email')

@@ -4,32 +4,13 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
-
-def add_attribute(field, attr_name, attr_value):
-    existing = field.widget.attrs.get(attr_name, '')
-    field.widget.attrs[attr_name] = f'{existing} {attr_value}'.strip()
-
-
-def add_placeholder(field, value):
-    add_attribute(field, 'placeholder', value)
+# def add_attribute(field, attr_name, attr_value):
+#    existing = field.widget.attrs.get(attr_name, '')
+#    field.widget.attrs[attr_name] = f'{existing} {attr_value}'.strip()
 
 
-def clean_password(self):
-    cleaned_data = super().clean()
-
-    password = cleaned_data.get('password')
-    password2 = cleaned_data.get('password2')
-
-    if password != password2:
-        match_error = ValidationError(
-            'Passwords do not match',
-            code='invalid',
-        )
-
-        raise ValidationError({
-            'password': match_error,
-            'password2': match_error,
-        })
+# def add_placeholder(field, value):
+#    add_attribute(field, 'placeholder', value)
 
 
 def strong_password(password):
@@ -100,7 +81,6 @@ class RegisterForm(forms.ModelForm):
         widget=forms.PasswordInput(
             attrs={'placeholder': 'Repeat your password'}
         ),
-        validators=[strong_password],
     )
 
     class Meta:
@@ -116,3 +96,28 @@ class RegisterForm(forms.ModelForm):
         widgets = {
             'last_name': forms.TextInput(attrs={'placeholder': 'Ex.: Doe'}),
         }
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '')
+
+        if User.objects.filter(email=email).exists():
+            raise ValidationError('Email already registered', code='invalid')
+
+        return email
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        password = cleaned_data.get('password')
+        password2 = cleaned_data.get('password2')
+
+        if password != password2:
+            match_error = ValidationError(
+                'Passwords do not match',
+                code='invalid',
+            )
+
+            raise ValidationError({
+                'password': match_error,
+                'password2': [match_error],
+            })
