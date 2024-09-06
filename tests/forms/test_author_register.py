@@ -5,7 +5,7 @@ from django.test import TestCase as DjangoTestCase
 from django.urls import reverse
 from parameterized import parameterized
 
-from authors.forms import RegisterForm
+from authors.forms.register import RegisterForm
 
 
 class AuthorRegisterFormUnitTest(TestCase):
@@ -83,7 +83,7 @@ class AuthorRegisterFormIntegrationTest(DjangoTestCase):
     ])
     def test_required_fields(self, field, error_message):
         self.form_data[field] = ''
-        url = reverse('authors:create')
+        url = reverse('authors:register_create')
         response = self.client.post(url, data=self.form_data, follow=True)
 
         # self.assertIn(error_message, response.content.decode('utf-8'))
@@ -92,7 +92,7 @@ class AuthorRegisterFormIntegrationTest(DjangoTestCase):
 
     def test_username_field_min_length(self):
         self.form_data['username'] = 'JRF'
-        url = reverse('authors:create')
+        url = reverse('authors:register_create')
         response = self.client.post(url, data=self.form_data, follow=True)
 
         message = 'Username must be at least 5 characters'
@@ -102,7 +102,7 @@ class AuthorRegisterFormIntegrationTest(DjangoTestCase):
 
     def test_username_field_max_length(self):
         self.form_data['username'] = 'a' * 151
-        url = reverse('authors:create')
+        url = reverse('authors:register_create')
         response = self.client.post(url, data=self.form_data, follow=True)
 
         message = 'Username must not exceed 150 characters'
@@ -112,7 +112,7 @@ class AuthorRegisterFormIntegrationTest(DjangoTestCase):
 
     def test_password_field_is_not_strong(self):
         self.form_data['password'] = 'weak'
-        url = reverse('authors:create')
+        url = reverse('authors:register_create')
         response = self.client.post(url, data=self.form_data, follow=True)
 
         error_message = 'Password is not strong enough'
@@ -121,7 +121,7 @@ class AuthorRegisterFormIntegrationTest(DjangoTestCase):
 
     def test_password_field_is_strong(self):
         # self.form_data['password'] = 'Str0ngPassword1'
-        url = reverse('authors:create')
+        url = reverse('authors:register_create')
         response = self.client.post(url, data=self.form_data, follow=True)
 
         error_message = 'Password is not strong enough'
@@ -131,7 +131,7 @@ class AuthorRegisterFormIntegrationTest(DjangoTestCase):
     def test_if_password_and_password_confirmation_are_equal(self):
         self.form_data['password2'] = 'Teste'
 
-        url = reverse('authors:create')
+        url = reverse('authors:register_create')
         response = self.client.post(url, data=self.form_data, follow=True)
 
         error_message = 'Passwords do not match'
@@ -140,13 +140,13 @@ class AuthorRegisterFormIntegrationTest(DjangoTestCase):
         assert error_message in response.content.decode('utf-8')
 
     def test_send_request_to_register_view_using_get(self):
-        url = reverse('authors:create')
+        url = reverse('authors:register_create')
         response = self.client.get(url)
 
         assert response.status_code == HTTPStatus.NOT_FOUND
 
     def test_if_email_already_exist(self):
-        url = reverse('authors:create')
+        url = reverse('authors:register_create')
 
         self.client.post(url, data=self.form_data, follow=True)
 
@@ -156,3 +156,20 @@ class AuthorRegisterFormIntegrationTest(DjangoTestCase):
 
         assert error_message in response.content.decode('utf-8')
         assert error_message in response.context['form'].errors.get('email')
+
+    def test_if_author_created_can_login(self):
+        url = reverse('authors:register_create')
+
+        self.form_data.update({
+            'username': 'testuser',
+            'password': '@Bc12346',
+            'password2': '@Bc12346',
+        })
+
+        self.client.post(url, data=self.form_data, follow=True)
+
+        is_authenticated = self.client.login(
+            username='testuser', password='@Bc12346'
+        )
+
+        assert is_authenticated

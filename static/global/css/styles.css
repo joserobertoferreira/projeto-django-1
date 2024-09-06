@@ -347,12 +347,24 @@ h6 {
   background: var(--color-primary-dark);
   color: var(--color-white);
   border: none;
-  border-radius: 0.4rem;
   cursor: pointer;
 }
 
 .form-label {
   font-weight: bold;
+}
+
+.inline-form {
+  display: inline;
+}
+
+.plaintext-button {
+  display: inline;
+  font-size: 1.6rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--color-primary);
 }
 
 /* Messages */
