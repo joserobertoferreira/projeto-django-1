@@ -1,5 +1,5 @@
 {% if recipes.has_other_pages %}
-  <div class="container pagination">
+  <nav role="navigation" aria-label="Pagination" class="container pagination">
     <div class="pagination-content">
       {% if pagination_range.has_previous %}
         <a class="page-link page-item" href="?page=1{{ url_query }}">1</a>
@@ -19,5 +19,5 @@
         <a class="page-link page-item" href="?page={{ pagination_range.total_pages }}{{ url_query }}">{{ pagination_range.total_pages }}</a>
       {% endif %}
     </div>
-  </div>
+  </nav>
 {% endif %}

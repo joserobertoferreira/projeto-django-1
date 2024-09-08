@@ -3,10 +3,7 @@ from django.test import TestCase
 from recipes.models import Category, Recipe, User
 
 
-class RecipeBaseTest(TestCase):
-    def setUp(self) -> None:
-        return super().setUp()
-
+class RecipeMixin:
     def create_category(self, name='Outros') -> Category:  # noqa: PLR6301
         return Category.objects.create(name=name)
 
@@ -61,3 +58,22 @@ class RecipeBaseTest(TestCase):
             category=self.create_category(**category_data),
             author=self.create_author(**author_data),
         )
+
+    def recipe_factory(self, recipes_number=10):
+        recipes = []
+
+        for i in range(recipes_number):
+            kwargs = {
+                'title': f'Recipe Title {i}',
+                'slug': f'r{i}',
+                'author_data': {'username': f'u{i}'},
+            }
+            recipe = self.create_recipe(**kwargs)
+            recipes.append(recipe)
+
+        return recipes
+
+
+class RecipeBaseTest(TestCase, RecipeMixin):
+    def setUp(self) -> None:
+        return super().setUp()

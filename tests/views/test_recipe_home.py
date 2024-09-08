@@ -47,9 +47,7 @@ class HomeViewsTest(RecipeBaseTest):
 
     @patch('recipes.views.PER_PAGE', new=3)
     def test_recipe_home_pagination(self):
-        for i in range(8):
-            kwargs = {'slug': f'r{i}', 'author_data': {'username': f'u{i}'}}
-            self.create_recipe(**kwargs)
+        self.recipe_factory(8)
 
         response = self.client.get(reverse('recipes:home'))
 
@@ -63,9 +61,7 @@ class HomeViewsTest(RecipeBaseTest):
 
     @patch('recipes.views.PER_PAGE', new=3)
     def test_send_recipe_invalid_page(self):
-        for i in range(8):
-            kwargs = {'slug': f'r{i}', 'author_data': {'username': f'u{i}'}}
-            self.create_recipe(**kwargs)
+        self.recipe_factory(8)
 
         response = self.client.get(reverse('recipes:home') + '?page=1a')
 
