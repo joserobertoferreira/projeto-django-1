@@ -17,5 +17,5 @@ class RecipeBaseTest(StaticLiveServerTestCase, RecipeMixin):
 
         return super().tearDown()
 
-    def waitFor(self, timeout) -> None:  # noqa: PLR6301
+    def waitFor(self, timeout=5) -> None:  # noqa: PLR6301
         time.sleep(timeout)
