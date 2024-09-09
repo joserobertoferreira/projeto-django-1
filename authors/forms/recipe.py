@@ -51,7 +51,7 @@ class AuthorsRecipeForm(forms.ModelForm):
     def clean_description(self):
         description = self.cleaned_data.get('description')
 
-        if len(description) < 20:  # noqa: PLR2004
+        if description is None or len(description) < 20:  # noqa: PLR2004
             self._my_errors['description'].append(
                 'Descrição precisa ter no mínimo 20 caracteres',
             )
@@ -85,7 +85,7 @@ class AuthorsRecipeForm(forms.ModelForm):
 
         title = clean_data.get('title')
 
-        if len(title) < 5:  # noqa: PLR2004
+        if title is None or len(title) < 5:  # noqa: PLR2004
             self._my_errors['title'].append(
                 'Título precisa ter no mínimo 5 caracteres',
             )
