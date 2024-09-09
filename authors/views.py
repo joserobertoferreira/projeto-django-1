@@ -8,6 +8,7 @@ from django.urls import reverse
 from authors.forms import LoginForm, RegisterForm
 from authors.forms.recipe import AuthorsRecipeForm
 from recipes.models import Recipe
+from resources.utils.strings import is_number
 
 
 def register(request):
@@ -156,9 +157,16 @@ def dashboard_recipe_create(request):
     if form.is_valid():
         recipe: Recipe = form.save(commit=False)
 
+        recipe.slug = recipe.title
         recipe.author = request.user
         recipe.is_published = False
         recipe.preparation_steps_is_html = False
+
+        if is_number(recipe.preparation_time):
+            recipe.preparation_time = int(form.data['preparation_time'])
+
+        if is_number(recipe.servings):
+            recipe.servings = int(form.data['servings'])
 
         recipe.save()
 
@@ -176,3 +184,21 @@ def dashboard_recipe_create(request):
             'form_action': reverse('authors:dashboard_recipe_create'),
         },
     )
+
+
+@login_required(login_url='authors:login', redirect_field_name='next')
+def dashboard_recipe_delete(request, id) -> None:
+    recipe = Recipe.objects.filter(
+        pk=id,
+        is_published=False,
+        author=request.user,
+    ).first()
+
+    if not recipe:
+        raise Http404
+
+    recipe.delete()
+
+    messages.success(request, 'Recipe was deleted successfully.')
+
+    return redirect(reverse('authors:dashboard'))

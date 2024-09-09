@@ -5,13 +5,14 @@ from django.core.exceptions import ValidationError
 
 from recipes.models import Recipe
 from resources.utils.django_forms import add_attribute
+from resources.utils.strings import is_positive_number
 
 
 class AuthorsRecipeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._errors = defaultdict(list)
+        self._my_errors = defaultdict(list)
 
         add_attribute(self.fields.get('preparation_steps'), 'class', 'span-2')
 
@@ -47,31 +48,49 @@ class AuthorsRecipeForm(forms.ModelForm):
             ),
         }
 
-    def clean(self, *args, **kwargs):
-        super_clean = super().clean(*args, **kwargs)
-
-        clean_data = self.clean_data
-
-        title = clean_data.get('title')
-
-        if len(title) < 5:  # noqa: PLR2004
-            self._errors['title'].append(
-                'Título precisa ter no mínimo 5 caracteres',
-                code='title_too_short',
-            )
-
-        if self._errors:
-            raise ValidationError(self._errors)
-
-        return super_clean
-
     def clean_description(self):
         description = self.cleaned_data.get('description')
 
         if len(description) < 20:  # noqa: PLR2004
-            self._errors['description'].append(
+            self._my_errors['description'].append(
                 'Descrição precisa ter no mínimo 20 caracteres',
-                code='description_too_short',
             )
 
         return description
+
+    def clean_preparation_time(self):
+        preparation_time = self.cleaned_data.get('preparation_time')
+
+        if not is_positive_number(preparation_time):
+            self._my_errors['preparation_time'].append(
+                'Tempo de preparo precisa ser positivo',
+            )
+
+        return preparation_time
+
+    def clean_servings(self):
+        servings = self.cleaned_data.get('servings')
+
+        if not is_positive_number(servings):
+            self._my_errors['servings'].append(
+                'Quantidade de porções precisa ser positivo',
+            )
+
+        return servings
+
+    def clean(self, *args, **kwargs):
+        super_clean = super().clean(*args, **kwargs)
+
+        clean_data = self.cleaned_data
+
+        title = clean_data.get('title')
+
+        if len(title) < 5:  # noqa: PLR2004
+            self._my_errors['title'].append(
+                'Título precisa ter no mínimo 5 caracteres',
+            )
+
+        if self._my_errors:
+            raise ValidationError(self._my_errors)
+
+        return super_clean
