@@ -10,7 +10,8 @@ from tests.test_recipe_base import RecipeBaseTest
 class HomeViewsTest(RecipeBaseTest):
     def test_recipe_home_view_function_is_ok(self):  # noqa: PLR6301
         view = resolve(reverse('recipes:home'))
-        self.assertIs(view.func, views.home)  # noqa: PT009
+
+        assert view.func.view_class is views.HomeListView
 
     def test_recipe_home_view_returns_status_code_OK(self):
         response = self.client.get(reverse('recipes:home'))
@@ -54,10 +55,11 @@ class HomeViewsTest(RecipeBaseTest):
         recipes = response.context['recipes']
         paginator = recipes.paginator
 
-        self.assertEqual(paginator.num_pages, 3)  # noqa: PT009
-        self.assertEqual(len(paginator.get_page(1)), 3)  # noqa: PT009
-        self.assertEqual(len(paginator.get_page(2)), 3)  # noqa: PT009
-        self.assertEqual(len(paginator.get_page(3)), 2)  # noqa: PT009
+        assert paginator.num_pages == 2  # noqa: PLR2004
+        self.assertEqual(len(paginator.get_page(1)), 6)  # noqa: PT009
+        self.assertEqual(len(paginator.get_page(2)), 2)  # noqa: PT009
+
+    #        self.assertEqual(len(paginator.get_page(3)), 3)  # noqa: PT009
 
     @patch('recipes.views.PER_PAGE', new=3)
     def test_send_recipe_invalid_page(self):

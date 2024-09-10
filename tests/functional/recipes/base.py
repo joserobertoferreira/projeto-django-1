@@ -8,7 +8,7 @@ from tests.test_recipe_base import RecipeMixin
 
 class RecipeBaseTest(StaticLiveServerTestCase, RecipeMixin):
     def setUp(self) -> None:
-        self.browser = chrome_browser()  # '--headless')
+        self.browser = chrome_browser('--headless')
 
         return super().setUp()
 

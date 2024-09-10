@@ -7,10 +7,11 @@ from tests.test_recipe_base import RecipeBaseTest
 
 
 class SearchViewsTest(RecipeBaseTest):
-    def test_recipe_view_search(self):
+    def test_recipe_view_search(self):  # noqa: PLR6301
         url = reverse('recipes:search')
         resolved = resolve(url)
-        self.assertIs(resolved.func, views.search)  # noqa: PT009
+
+        assert resolved.func.view_class is views.SearchListView
 
     def test_recipe_search_template_is_loaded(self):
         url = reverse('recipes:search') + '?search=recipe'
@@ -20,7 +21,8 @@ class SearchViewsTest(RecipeBaseTest):
     def test_recipe_search_raises_error(self):
         url = reverse('recipes:search')
         response = self.client.get(url)
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)  # noqa: PT009
+
+        assert response.status_code == HTTPStatus.NOT_FOUND
 
     def test_recipe_search_term_is_safe(self):
         url = reverse('recipes:search') + '?search=<recipe>'

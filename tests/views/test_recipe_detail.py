@@ -9,7 +9,7 @@ from tests.test_recipe_base import RecipeBaseTest
 class DetailViewsTest(RecipeBaseTest):
     def test_recipe_detail_view_function_is_ok(self):  # noqa: PLR6301
         view = resolve(reverse('recipes:recipe', kwargs={'id': 1}))
-        self.assertIs(view.func, views.recipe)  # noqa: PT009
+        assert view.func.view_class is views.DetailView
 
     def test_recipe_detail_view_returns_status_code_NOT_FOUND(self):
         response = self.client.get(

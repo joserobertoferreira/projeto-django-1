@@ -1,4 +1,5 @@
-from django.views.generic import ListView
+from recipes.views.base import RecipeBaseListView
 
 
-class HomeListView(ListView): ...
+class HomeListView(RecipeBaseListView):
+    template_name = 'recipes/pages/home.html'

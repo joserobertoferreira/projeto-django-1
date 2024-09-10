@@ -8,7 +8,7 @@ from resources.utils.browser import chrome_browser
 
 class AuthorsBaseTest(StaticLiveServerTestCase):
     def setUp(self) -> None:
-        self.browser = chrome_browser()  # '--headless')
+        self.browser = chrome_browser('--headless')
 
         return super().setUp()
 
