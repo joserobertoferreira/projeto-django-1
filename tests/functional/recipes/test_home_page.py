@@ -36,7 +36,7 @@ class TestHomePage(RecipeBaseTest):
 
         assert recipes[0].title in body
 
-    @patch('recipes.views.PER_PAGE', new=2)
+    @patch('recipes.views.base.PER_PAGE', new=2)
     def test_recipe_home_pagination(self):
         # create a recipes to test search input
         self.recipe_factory()
