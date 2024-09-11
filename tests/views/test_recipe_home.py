@@ -46,7 +46,7 @@ class HomeViewsTest(RecipeBaseTest):
             '<h1>Não existem receitas</h1>', response.content.decode('utf-8')
         )
 
-    @patch('recipes.views.PER_PAGE', new=3)
+    @patch('recipes.views.base.PER_PAGE', new=3)
     def test_recipe_home_pagination(self):
         self.recipe_factory(8)
 
@@ -55,13 +55,14 @@ class HomeViewsTest(RecipeBaseTest):
         recipes = response.context['recipes']
         paginator = recipes.paginator
 
-        assert paginator.num_pages == 2  # noqa: PLR2004
-        self.assertEqual(len(paginator.get_page(1)), 6)  # noqa: PT009
-        self.assertEqual(len(paginator.get_page(2)), 2)  # noqa: PT009
+        assert paginator.num_pages == 3  # noqa: PLR2004
+        assert len(paginator.get_page(1)) == 3  # noqa: PLR2004
+        assert len(paginator.get_page(2)) == 3  # noqa: PLR2004
+        assert len(paginator.get_page(3)) == 2  # noqa: PLR2004
 
     #        self.assertEqual(len(paginator.get_page(3)), 3)  # noqa: PT009
 
-    @patch('recipes.views.PER_PAGE', new=3)
+    @patch('recipes.views.base.PER_PAGE', new=3)
     def test_send_recipe_invalid_page(self):
         self.recipe_factory(8)
 
